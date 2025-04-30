@@ -73,8 +73,7 @@ jobs:
 
       - name: Ensure gh-pages branch exists
         run: |
-          git fetch origin gh-pages || (git checkout --orphan gh-pages && git rm -rf . || true)
-          git push origin gh-pages || true
+          git fetch origin gh-pages || (git branch temp-gh-pages HEAD && git push origin temp-gh-pages:gh-pages && git branch -d temp-gh-pages)
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
