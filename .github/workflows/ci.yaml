@@ -71,6 +71,11 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Ensure gh-pages branch exists
+        run: |
+          git fetch origin gh-pages || (git checkout --orphan gh-pages && git rm -rf . || true)
+          git push origin gh-pages || true
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         env:
