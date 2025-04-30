@@ -1,8 +1,7 @@
 # Warpflow Kubernetes Helm Charts
 
-![GitHub License](https://img.shields.io/github/license/shaneholloman/warpflow-helm-charts)
-![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=Warpflow-ide-*)
-![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=Warpflow-runtime-*)
+[![Dependabot Updates](https://github.com/shaneholloman/warpflow-helm-charts/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/shaneholloman/warpflow-helm-charts/actions/workflows/dependabot/dependabot-updates)
+[![Charts CI and Release](https://github.com/shaneholloman/warpflow-helm-charts/actions/workflows/ci.yaml/badge.svg)](https://github.com/shaneholloman/warpflow-helm-charts/actions/workflows/ci.yaml)
 
 ## Charts
 
