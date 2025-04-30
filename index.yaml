@@ -1,0 +1,36 @@
+apiVersion: v1
+entries:
+  warpflow-ide:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2025-04-30T13:22:31.948294088Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.x
+    description: Helm chart for Warpflow IDE
+    digest: bd577bfa6d7ef6715ccbb2e58d8f26f1f4caad56ad9ac866c5171c274a88a29f
+    maintainers:
+    - email: contact@warpflow.io
+      name: Warpflow
+    name: warpflow-ide
+    type: application
+    urls:
+    - https://github.com/shaneholloman/warpflow-helm-charts/releases/download/warpflow-ide-0.1.1/warpflow-ide-0.1.1.tgz
+    version: 0.1.1
+  warpflow-runtime:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2025-04-30T13:22:32.095315486Z"
+    description: A helm chart for running Warpflow flows as a service
+    digest: cb90af5b8121ff438ec0f3e82225cb299b18f8c8e8a671dfa8ec6a07d9359184
+    maintainers:
+    - email: contact@warpflow.io
+      name: Warpflow
+    name: warpflow-runtime
+    type: application
+    urls:
+    - https://github.com/shaneholloman/warpflow-helm-charts/releases/download/warpflow-runtime-0.1.1/warpflow-runtime-0.1.1.tgz
+    version: 0.1.1
+generated: "2025-04-30T13:22:32.095325074Z"
