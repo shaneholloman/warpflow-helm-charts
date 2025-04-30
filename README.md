@@ -1,17 +1,17 @@
-# Langflow Kubernetes Helm Charts
+# Warpflow Kubernetes Helm Charts
 
 ![GitHub License](https://img.shields.io/github/license/shaneholloman/warpflow-helm-charts)
-![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-ide-*)
-![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-runtime-*)
+![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=Warpflow-ide-*)
+![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=Warpflow-runtime-*)
 
 ## Charts
 
-- [LangFlow IDE](./charts/langflow-ide/): Full experience of Langflow, optimized for prototyping and testing new flows.
-- [LangFlow Runtime](./charts/langflow-runtime/): Productize Langflow flows as standalone services.
+- [Warpflow IDE](./charts/Warpflow-ide/): Full experience of Warpflow, optimized for prototyping and testing new flows.
+- [Warpflow Runtime](./charts/Warpflow-runtime/): Productize Warpflow flows as standalone services.
 
-## Langflow IDE vs Runtime
+## Warpflow IDE vs Runtime
 
-Langflow offers two distinct Kubernetes charts for deployment: one for the Integrated Development Environment (IDE) and another for the Runtime environment.
+Warpflow offers two distinct Kubernetes charts for deployment: one for the Integrated Development Environment (IDE) and another for the Runtime environment.
 This separation is designed to enhance security, optimize resource allocation, and streamline management.
 Understanding the rationale behind these deployment options will help you make informed decisions about how to best deploy and manage your applications.
 
