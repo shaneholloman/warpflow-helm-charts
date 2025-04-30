@@ -1,10 +1,8 @@
 # Langflow Kubernetes Helm Charts
 
-<div class="column">
-  <img alt="GitHub License" src="https://img.shields.io/github/license/shaneholloman/warpflow-helm-charts">
-  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-ide-*">
-  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-runtime-*">
-</div>
+![GitHub License](https://img.shields.io/github/license/shaneholloman/warpflow-helm-charts)
+![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-ide-*)
+![GitHub Release](https://img.shields.io/github/v/release/shaneholloman/warpflow-helm-charts?filter=langflow-runtime-*)
 
 ## Charts
 
