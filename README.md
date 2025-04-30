@@ -5,8 +5,8 @@
 
 ## Charts
 
-- [Warpflow IDE](./charts/Warpflow-ide/): Full experience of Warpflow, optimized for prototyping and testing new flows.
-- [Warpflow Runtime](./charts/Warpflow-runtime/): Productize Warpflow flows as standalone services.
+- [Warpflow IDE](charts/warpflow-ide/): Full experience of Warpflow, optimized for prototyping and testing new flows.
+- [Warpflow Runtime](charts/warpflow-runtime/): Productize Warpflow flows as standalone services.
 
 ## Warpflow IDE vs Runtime
 
