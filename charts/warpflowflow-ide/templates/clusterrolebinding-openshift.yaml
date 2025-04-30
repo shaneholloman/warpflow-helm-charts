@@ -4,16 +4,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "langflow-runtime.fullname" . }}-openshift-scc
+  name: {{ include "warpflow.fullname" . }}-openshift-scc
   labels:
-    {{- include "langflow-runtime.labels" . | nindent 4 }}
+    {{- include "warpflow.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "langflow-runtime.fullname" . }}-openshift-scc
+  name: {{ include "warpflow.fullname" . }}-openshift-scc
 subjects:
   - kind: ServiceAccount
-    name: {{ include "langflow-runtime.serviceAccountName" . }}
+    name: {{ include "warpflow.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{- end -}}
 {{- end -}}

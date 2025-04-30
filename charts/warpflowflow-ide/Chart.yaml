@@ -1,12 +1,12 @@
 apiVersion: v2
-name: langflow-ide
-description: Helm chart for Langflow IDE
+name: warpflow-ide
+description: Helm chart for Warpflow IDE
 type: application
 version: 0.1.1
 appVersion: latest
 maintainers:
-  - name: Langflow
-    email: contact@langflow.org
+  - name: Warpflow
+    email: contact@warpflow.io
 dependencies:
   - name: postgresql
     version: 15.x

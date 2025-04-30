@@ -1,0 +1,115 @@
+{{- if .Values.warpflow.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "warpflow.fullname" . }}-frontend
+  labels:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+    warpflow-scope: "frontend"
+spec:
+  replicas: {{ .Values.warpflow.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "warpflow.name" . }}
+      chart: {{ template "warpflow.chart" . }}
+      release: {{ .Release.Name }}
+      warpflow-scope: "frontend"
+  template:
+    metadata:
+      {{- with .Values.warpflow.frontend.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ template "warpflow.name" . }}
+        chart: {{ template "warpflow.chart" . }}
+        release: {{ .Release.Name }}
+        warpflow-scope: "frontend"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "warpflow.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- if .Values.secretProvider.enabled }}
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{- .Values.secretProvider.name }}"
+        {{- end }}
+        {{- with .Values.warpflow.frontend.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: nginx
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.warpflow.frontend.image.repository }}:{{ .Values.warpflow.frontend.image.tag | default .Values.warpflow.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.warpflow.frontend.image.imagePullPolicy | default .Values.warpflow.global.image.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.warpflow.frontend.service.port }}
+              protocol: TCP
+          volumeMounts:
+            {{- if .Values.secretProvider.enabled }}
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+            {{- end }}
+            {{- with .Values.warpflow.frontend.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+            - name: nginx
+              mountPath: "/tmp/nginx"
+              readOnly: false
+            - name: nginx-cache
+              mountPath: "/var/cache/nginx"
+              readOnly: false
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: {{ .Values.warpflow.frontend.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.warpflow.frontend.probe.periodSeconds }}
+            timeoutSeconds: {{ .Values.warpflow.frontend.probe.timeoutSeconds }}
+            failureThreshold: {{ .Values.warpflow.frontend.probe.failureThreshold }}   
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: {{ .Values.warpflow.frontend.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.warpflow.frontend.probe.periodSeconds }}
+            timeoutSeconds: {{ .Values.warpflow.frontend.probe.timeoutSeconds }}
+            failureThreshold: {{ .Values.warpflow.frontend.probe.failureThreshold }}   
+          env:
+            - name: BACKEND_URL
+              value: "http://{{ template "warpflow.fullname" . }}-backend.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.warpflow.backend.service.port }}"
+            - name: FRONTEND_PORT
+              value: "{{ .Values.warpflow.frontend.service.port }}"
+          resources:
+            {{- toYaml .Values.warpflow.frontend.resources | nindent 12 }}
+      {{- with .Values.warpflow.frontend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.warpflow.frontend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.warpflow.frontend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

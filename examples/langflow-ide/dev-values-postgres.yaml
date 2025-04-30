@@ -1,29 +1,29 @@
 postgresql:
   enabled: true
-  fullnameOverride: "langflow-ide-postgresql-service"
+  fullnameOverride: "warpflow-ide-postgresql-service"
   auth:
-    username: "langflow"
-    password: "langflow-postgres"
-    database: "langflow-db"
+    username: "warpflow"
+    password: "warpflow-postgres"
+    database: "warpflow-db"
 
-langflow:
+warpflow:
   backend:
     externalDatabase:
       enabled: true
       driver:
         value: "postgresql"
       host:
-        value: "langflow-ide-postgresql-service"
+        value: "warpflow-ide-postgresql-service"
       port:
         value: "5432"
       database:
-        value: "langflow-db"
+        value: "warpflow-db"
       user:
-        value: "langflow"
+        value: "warpflow"
       password:
         valueFrom:
           secretKeyRef:
             key: "password"
-            name: "langflow-ide-postgresql-service"
+            name: "warpflow-ide-postgresql-service"
     sqlite:
       enabled: false

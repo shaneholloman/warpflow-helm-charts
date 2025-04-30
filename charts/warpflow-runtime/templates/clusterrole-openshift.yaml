@@ -4,9 +4,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "langflow-runtime.fullname" . }}-openshift-scc
+  name: {{ include "warpflow-runtime.fullname" . }}-openshift-scc
   labels:
-    {{- include "langflow-runtime.labels" . | nindent 4 }}
+    {{- include "warpflow-runtime.labels" . | nindent 4 }}
 rules:
 - apiGroups:
     - security.openshift.io

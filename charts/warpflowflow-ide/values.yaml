@@ -1,11 +1,11 @@
 imagePullSecrets: []
 
-nameOverride: "langflow-service"
+nameOverride: "warpflow-service"
 # Override for the name of the helm deployment
-# Note: using `langflow` as service name causes
+# Note: using `warpflow` as service name causes
 # env var collision when deploying on openshift
-# https://github.com/langflow-ai/langflow/issues/4330#issuecomment-2459097917
-fullnameOverride: "langflow-service"
+# https://github.com/warpflow-ai/warpflow/issues/4330#issuecomment-2459097917
+fullnameOverride: "warpflow-service"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -19,7 +19,8 @@ serviceAccount:
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -46,8 +47,7 @@ podSecurityContext:
   runAsNonRoot: true
   runAsGroup: 1000
 
-
-langflow:
+warpflow:
   global:
     image:
       tag: "latest"
@@ -59,13 +59,13 @@ langflow:
     backendOnly: true
     numWorkers: 1
     image:
-      repository: langflowai/langflow
+      repository: warpflowai/warpflow
       imagePullPolicy: IfNotPresent
       tag: latest
     command:
       - python
       - -m
-      - langflow
+      - warpflow
       - run
       - --host
       - 0.0.0.0
@@ -83,11 +83,11 @@ langflow:
       timeoutSeconds: 5
       initialDelaySeconds: 5
     env:
-      - name: LANGFLOW_PORT
+      - name: WARPFLOW_PORT
         value: "7860"
-      - name: LANGFLOW_ALEMBIC_LOG_FILE
+      - name: WARPFLOW_ALEMBIC_LOG_FILE
         value: "/app/db/alembic.log"
-      - name: LANGFLOW_UPDATE_STARTER_PROJECTS
+      - name: WARPFLOW_UPDATE_STARTER_PROJECTS
         value: "false"
     nodeSelector: {}
     tolerations: []
@@ -117,11 +117,13 @@ langflow:
       # Compose in the SQLAlchemy format:
       # https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls
       enabled: false
-      driver: {}
+      driver:
+        {}
         # value: "postgresql"
       port: {}
       user: {}
-      password: {}
+      password:
+        {}
         # valueFrom:
         #   secretKeyRef:
         #    key: password
@@ -202,7 +204,7 @@ langflow:
       type: ClusterIP
       port: 8080
     image:
-      repository: langflowai/langflow-frontend
+      repository: warpflowai/warpflow-frontend
       imagePullPolicy: IfNotPresent
       tag: latest
     resources:

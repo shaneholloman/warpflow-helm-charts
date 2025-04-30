@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "langflow-runtime.fullname" . }}
+  name: {{ include "warpflow-runtime.fullname" . }}
   labels:
-    {{- include "langflow-runtime.labels" . | nindent 4 }}
+    {{- include "warpflow-runtime.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "langflow-runtime.selectorLabels" . | nindent 6 }}
+      {{- include "warpflow-runtime.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -16,7 +16,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "langflow-runtime.labels" . | nindent 8 }}
+        {{- include "warpflow-runtime.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -25,7 +25,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "langflow-runtime.serviceAccountName" . }}
+      serviceAccountName: {{ include "warpflow-runtime.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -71,9 +71,9 @@ spec:
               {{- end }}
               {{- end }}
               echo 'Flows downloaded' && 
-              langflow run --backend-only --host 0.0.0.0 --port {{ .Values.service.port }}
+              warpflow run --backend-only --host 0.0.0.0 --port {{ .Values.service.port }}
           env:
-            - name: LANGFLOW_LOAD_FLOWS_PATH
+            - name: WARPFLOW_LOAD_FLOWS_PATH
               value: "{{ .Values.downloadFlows.path }}"
             {{- toYaml .Values.env | nindent 12 }}
       {{- with .Values.volumes }}

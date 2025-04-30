@@ -1,0 +1,27 @@
+{{- if and .Values.warpflow.backend.sqlite.enabled (not .Values.warpflow.backend.sqlite.volume.existingStorageClassName) }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: "{{ template "warpflow.fullname" . }}-sqlite"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+{{- if .Values.warpflow.backend.sqlite.volume.storageClass }}
+provisioner: {{ .Values.warpflow.backend.sqlite.volume.storageClass.provisioner }}
+parameters:
+  {{- if .Values.warpflow.backend.sqlite.volume.storageClass.type }}
+  type: {{ .Values.warpflow.backend.sqlite.volume.storageClass.type }}
+  {{- end }}
+  {{- if .Values.warpflow.backend.sqlite.volume.storageClass.fsType }}
+  fsType: {{ .Values.warpflow.backend.sqlite.volume.storageClass.fsType }}
+  {{- end }}
+  {{- if .Values.warpflow.backend.sqlite.volume.storageClass.extraParams }}
+{{ toYaml .Values.warpflow.backend.sqlite.volume.storageClass.extraParams | indent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}

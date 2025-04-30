@@ -1,0 +1,173 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "warpflow.fullname" . }}
+  labels:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+    warpflow-scope: "backend"
+spec:
+  serviceName: "{{ include "warpflow.fullname" . }}-service"
+  replicas: {{ .Values.warpflow.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "warpflow.name" . }}
+      chart: {{ template "warpflow.chart" . }}
+      release: {{ .Release.Name }}
+      warpflow-scope: "backend"
+  template:
+    metadata:
+      {{- with .Values.warpflow.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ template "warpflow.name" . }}
+        chart: {{ template "warpflow.chart" . }}
+        release: {{ .Release.Name }}
+        warpflow-scope: "backend"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "warpflow.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- if .Values.secretProvider.enabled }}
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "{{- .Values.secretProvider.name }}"
+        {{- end }}
+        {{- with .Values.warpflow.backend.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.warpflow.backend.image.repository }}:{{ .Values.warpflow.backend.image.tag  | default .Values.warpflow.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.warpflow.backend.image.imagePullPolicy | default .Values.warpflow.global.image.imagePullPolicy }}
+          command: ["/bin/bash", "-c"]
+          args:
+            - >
+              set -e &&
+              if [ -n "$LF_CHART_EXTERNALDB_DRIVER" ]; then
+                echo "LF_CHART_EXTERNALDB_DRIVER is set, using external database at $LF_CHART_EXTERNALDB_HOST" &&
+                export WARPFLOW_DATABASE_URL="$LF_CHART_EXTERNALDB_DRIVER://$LF_CHART_EXTERNALDB_USER:$LF_CHART_EXTERNALDB_PASSWORD@$LF_CHART_EXTERNALDB_HOST:$LF_CHART_EXTERNALDB_PORT/$LF_CHART_EXTERNALDB_DATABASE"
+              else
+                echo "LF_CHART_EXTERNALDB_DRIVER is not set, using SQLLite database"
+              fi &&
+              warpflow run --host 0.0.0.0 --port {{ .Values.warpflow.backend.service.port }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.warpflow.backend.service.port }}
+              protocol: TCP
+          {{- if or .Values.secretProvider.enabled .Values.warpflow.backend.sqlite.enabled .Values.warpflow.backend.volumeMounts }}
+          volumeMounts:
+            {{- if .Values.secretProvider.enabled }}
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+            {{- end }}
+            {{- if .Values.warpflow.backend.sqlite.enabled }}
+            - name: data
+              mountPath: /data
+            {{- end }}
+            {{- with .Values.warpflow.backend.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              
+            initialDelaySeconds: {{ .Values.warpflow.backend.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.warpflow.backend.probe.periodSeconds }}
+            timeoutSeconds: {{ .Values.warpflow.backend.probe.timeoutSeconds }}
+            failureThreshold: {{ .Values.warpflow.backend.probe.failureThreshold }}   
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: {{ .Values.warpflow.backend.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.warpflow.backend.probe.periodSeconds }}
+            timeoutSeconds: {{ .Values.warpflow.backend.probe.timeoutSeconds }}
+            failureThreshold: {{ .Values.warpflow.backend.probe.failureThreshold }}   
+          env:
+            - name: WARPFLOW_BACKEND_ONLY
+              value: "{{ .Values.warpflow.backend.backendOnly }}"
+            - name: WARPFLOW_NUM_WORKERS
+              value: "{{ .Values.warpflow.backend.numWorkers }}"
+            {{- if .Values.warpflow.backend.sqlite.enabled }}
+            - name: WARPFLOW_DATABASE_URL
+              value: "sqlite:////data/warpflow.db"
+            {{- end }}
+            {{- with .Values.warpflow.backend.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.warpflow.backend.externalDatabase.enabled }}
+            - name: LF_CHART_EXTERNALDB_DRIVER
+            {{- toYaml .Values.warpflow.backend.externalDatabase.driver | nindent 14 }}
+            - name: LF_CHART_EXTERNALDB_HOST
+            {{- toYaml .Values.warpflow.backend.externalDatabase.host | nindent 14 }}
+            - name: LF_CHART_EXTERNALDB_PORT
+            {{- toYaml .Values.warpflow.backend.externalDatabase.port | nindent 14 }}
+            - name: LF_CHART_EXTERNALDB_DATABASE
+            {{- toYaml .Values.warpflow.backend.externalDatabase.database | nindent 14 }}
+            - name: LF_CHART_EXTERNALDB_USER
+            {{- toYaml .Values.warpflow.backend.externalDatabase.user | nindent 14 }}
+            - name: LF_CHART_EXTERNALDB_PASSWORD
+            {{- toYaml .Values.warpflow.backend.externalDatabase.password | nindent 14 }}
+            {{- end }}
+            {{- if and (hasKey .Values.warpflow.backend "autoLogin") (eq .Values.warpflow.backend.autoLogin false) }}
+            - name: WARPFLOW_AUTO_LOGIN
+              value: "{{ .Values.warpflow.backend.autoLogin | default "False" }}"
+            - name: WARPFLOW_SUPERUSER
+              value: "{{ .Values.warpflow.backend.superuser | default "admin" }}"
+            - name: WARPFLOW_SUPERUSER_PASSWORD
+              value: "{{ .Values.warpflow.backend.superuserPassword | default (randAlphaNum 32) }}"
+            - name: WARPFLOW_SECRET_KEY
+              value: "{{ .Values.warpflow.backend.secretKey | default (randAlphaNum 32) }}"
+            - name: WARPFLOW_NEW_USER_IS_ACTIVE
+              value: "{{ .Values.warpflow.backend.newUserIsActive | default "False" }}"
+            {{- end }}
+          resources:
+            {{- toYaml .Values.warpflow.backend.resources | nindent 12 }}
+      {{- with .Values.warpflow.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.warpflow.backend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.warpflow.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.warpflow.backend.sqlite.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.warpflow.backend.sqlite.volume.size }}
+      {{- if .Values.warpflow.backend.sqlite.volume.existingStorageClassName }}
+      {{- if ne .Values.warpflow.backend.sqlite.volume.existingStorageClassName "default"}}
+      storageClassName: {{ .Values.warpflow.backend.sqlite.volume.existingStorageClassName }}
+      {{- else }}
+      {{- end }}
+      {{- else }}
+      storageClassName: "{{ template "warpflow.fullname" . }}-sqlite"
+      {{- end }}
+      
+  {{- end }}

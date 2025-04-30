@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "warpflow.fullname" . }}
+  labels:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.warpflow.frontend.service.type }}
+  ports:
+    - port: {{ .Values.warpflow.frontend.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+    warpflow-scope: "frontend"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "warpflow.fullname" . }}-backend
+  labels:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.warpflow.backend.service.type }}
+  ports:
+    - port: {{ .Values.warpflow.backend.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "warpflow.name" . }}
+    chart: {{ template "warpflow.chart" . }}
+    release: {{ .Release.Name }}
+    warpflow-scope: "backend"
