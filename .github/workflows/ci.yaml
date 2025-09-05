@@ -76,7 +76,7 @@ jobs:
           git fetch origin gh-pages || (git branch temp-gh-pages HEAD && git push origin temp-gh-pages:gh-pages && git branch -d temp-gh-pages)
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_SKIP_EXISTING: "true"
